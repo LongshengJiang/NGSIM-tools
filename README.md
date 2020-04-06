@@ -158,3 +158,5 @@ I assume you use your julia terminal (REPL) to practice on the tutorials. You ne
 julia
 ```
 Then, you go to the folder `\tutorials\` on this webpage and start your learning from there. I hope your learning journey is much smoother than mine. 
+
+![julia-welcome](media/julia_welcome.png)
