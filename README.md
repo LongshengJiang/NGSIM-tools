@@ -26,8 +26,9 @@ While do not claim any originality, in this repository we make sure you can find
 If you are working on your research and plan to publish papers, please check the original places of these packages and cite their work there. Thank you. (disclaimer: I am not affiliate with SISL.)
 
 ## Installation procedure:
+
 ### First, install julia v0.6.2
-If we want to install julia using command line, using the following code.
+If we want to install julia using command line, using the following code. I use Ubuntu 16.04.6. 
 ```bash
 # Let us install julia in home directory.
 cd ~
@@ -41,5 +42,19 @@ echo "export PATH=$(pwd)/julia-d386e40c17/bin:\$PATH" >> ~/.bashrc
 # Rerun .bashrc to update the changes
 source ~/.bashrc
 ```
-### Second,
-
+### Second, install packages of NGSIM-tools
+Install some packages to ubuntu 16.04 in case they are not there already.
+```bash
+sudo apt-get install libavcodec-ffmpeg56
+sudo apt-get install libavformat-ffmpeg56
+sudo apt-get install libavfilter-ffmpeg5
+sudo apt-get install libavdevice-ffmpeg56
+```
+Open julia by typing `julia` in your terminal. Make sure the version of julia should be v0.6.2.
+```julia
+Pkg.add("StaticArrays")
+Pkg.add("Reexport")
+Pkg.add("Colors")
+Pkg.add("DataFrames")
+```
+These commands will automatically create a new path: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
