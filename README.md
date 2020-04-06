@@ -100,7 +100,7 @@ unzip ~/Downloads/NGSIM-tools/zipped_packages/AutoViz.zip -d ~\.julia\v0.6\
 # unzip NGSIM.zip
 unzip ~/Downloads/NGSIM-tools/zipped_packages/NGSIM.zip -d ~\.julia\v0.6\
 ```
-The above command work like `Pkg.add()` in julia, I guess but not sure. 
+The above commands work like `Pkg.add()` in julia, I guess but not sure. 
 
 #### Download NGSIM data
 Go to the directory where the data should be placed.
