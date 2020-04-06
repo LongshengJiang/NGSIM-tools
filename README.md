@@ -68,7 +68,15 @@ Pkg.add("DataFrames")
 Pkg.add("ElectronDisplay")
 ```
 These commands will automatically create a new path: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
-
 When adding the above packages, their dependencies are automatically downloaded. Hence, it may take a longer time. Be patient. 
+
+The following steps are not as elegent. Because I want to install julia packages from specific branches or tags of certain github repositories, and I do not know how to make it happen in julia v0.6 by using `Pkg.clone(url)`. I did try `Pkg.clone(url, packagename); Pkg.checkout(packagename, branch)` and it did not work for me. 
+
+Instead, as a work around, I will show you how to download the zip files of the packages and install the zip files locally into julia v0.6. 
+First, download the NGSIM-tools.zip from the website. If you prefer command lines, use the following.
+```bash
+cd ~/Downloads/
+git clone 
+```
 
 
