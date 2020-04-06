@@ -25,5 +25,27 @@ While do not claim any originality, in this repository we make sure you can find
 3. The collection of tutorials on how to using the tools.
 If you are working on your research and plan to publish papers, please check the original places of these packages and cite their work there. Thank you. (disclaimer: I am not affiliate with SISL.)
 
+## Installation procedure
+# First, install julia v0.62
+If we want to install julia using command line, using the following code.
+```bash
+# Let us install julia in home directory.
+cd ~
+# Now we install julia-0.6.2
+wget https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6.2-linux-x86_64.tar.gz
+tar -xf julia-0.6.2-linux-x86_64.tar.gz
+# Clean the installation file.
+rm julia-0.6.2-linux-x86_64.tar.gz
+```
+If the above code does not work, if can always try to download the julia file included in this repository.
 
+In repository NGSIM-sim (this webpage), go to the folder `julia_source/` and download the `julia-0.6.2-linux-x86_64.tar.gz` to your home directory, which is `/home/<your_user_name>/`. Then, do the following.
+```bash
+# Let us install julia in home directory.
+cd ~
+# Now we install julia-0.6.2
+tar -xf julia-0.6.2-linux-x86_64.tar.gz
+# Clean the installation file.
+rm julia-0.6.2-linux-x86_64.tar.gz
+```
 
