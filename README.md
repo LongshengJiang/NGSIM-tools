@@ -12,11 +12,13 @@ Successful running the tools for dealing with NGSIM requires packages which are 
 While do not claim any originality, in this repository we make sure you can find all you need to get up and running the tools for dealing with NGSIM dataset. Specifically, the following are included.
 1. All the packages you will need:
     - Julia v0.6.2
+    - Records v0.6.0 (branch 0.6_legacy)
+    - Vec v0.6.0 (branch 0_6)
     - AutomotiveDriving v0.6.0
     - AutoViz v0.6.0
     - NGSIM v1.1.0
     - A portion of the NGSIM dataset
-    The dependency between the packages, base on my understanding, looks like the following diagram.
+    The dependency between the packages, base on my understanding, looks like the following diagram. 
     
       ![package-dependency](media/package_dependency.svg)
 2. The installation procedure
