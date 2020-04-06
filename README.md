@@ -1,4 +1,4 @@
-# NGSIM-sim (Under construction. Don't use!)
+# NGSIM-tools (Under construction. Don't use!)
 This repository collects a set of tools for extracting, visualizing, and simulating Next Generation Simulation (NGSIM) dataset. The tools are originally developed by Stanford Intelligent Systems Laboratory (SISL).  
 Please check their github repositories on https://github.com/sisl
 
