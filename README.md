@@ -52,7 +52,7 @@ echo "export PATH=$(pwd)/julia-d386e40c17/bin:\$PATH" >> ~/.bashrc
 source ~/.bashrc
 ```
 ### Second, install packages of NGSIM-tools
-Install some packages to ubuntu 16.04 in case they are not there already.
+Install some packages to ubuntu 16.04 in case they are not there already. In the terminal, do the following.
 ```bash
 sudo apt-get install libavcodec-ffmpeg56
 sudo apt-get install libavformat-ffmpeg56
@@ -65,5 +65,10 @@ Pkg.add("StaticArrays")
 Pkg.add("Reexport")
 Pkg.add("Colors")
 Pkg.add("DataFrames")
+Pkg.add("ElectronDisplay")
 ```
 These commands will automatically create a new path: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
+
+When adding the above packages, their dependencies are automatically downloaded. Hence, it may take a longer time. Be patient. 
+
+
