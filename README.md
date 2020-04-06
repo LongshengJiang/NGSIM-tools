@@ -16,6 +16,9 @@ While do not claim any originality, in this repository we make sure you can find
     - AutoViz v0.6.0
     - NGSIM v1.1.0
     - A portion of the NGSIM dataset
+    The dependency between the packages, base on my understanding, looks like the following diagram.
+    
+    ![package-dependency](media/package_dependency.svg)
 2. The installation procedure
 3. The collection of tutorials on how to using the tools.
 If you are working on your research and plan to publish papers, please check the original places of these packages and cite their work there. Thank you. (disclaimer: I am not affiliate with SISL.)
