@@ -71,7 +71,7 @@ Pkg.add("ElectronDisplay")
 These commands will automatically create a new directory: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
 When adding the above packages, their dependencies are automatically downloaded. Hence, it may take a longer time. Be patient. 
 
-#### Install the NGSIM-tools packages
+#### Install the NGSIM-tools packages locally
 The following steps are not as elegent. Because I want to install julia packages from specific branches or tags of certain github repositories, and I do not know how to make it happen in julia v0.6 by using `Pkg.clone(url)`. I did try `Pkg.clone(url, packagename); Pkg.checkout(packagename, branch)` and it did not work for me. 
 
 Instead, as a work around, I will show you how to download the zip files of the packages and install the zip files locally into julia v0.6. 
@@ -100,7 +100,25 @@ unzip ~/Downloads/NGSIM-tools/zipped_packages/NGSIM.zip -d ~\.julia\v0.6\
 ```
 The above command work like `Pkg.add()` in julia, I guess but not sure. 
 
-#### Install NGSIM data
+#### Download NGSIM data
+Go to the directory where the data should be placed.
+```bash
+cd ~/.julia/v0.6/NGSIM/data/
+```
+Download and unzip the data
+```bash
+wget https://github.com/sisl/NGSIM.jl/releases/download/v1.0.0/data.zip
+unzip data.zip
+# Answer yes to any that ask to be replaced.
+```
+Please remember to create trajectories from the raw data.
+```bash
+# Create trajectories from the data
+julia
+  >> using NGSIM
+  >> convert_raw_ngsim_to_trajdatas()
+  >> quit()
+```
 
 
 
