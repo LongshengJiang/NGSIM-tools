@@ -2,6 +2,9 @@
 This repository collects a set of tools for extracting, visualizing, and simulating Next Generation Simulation (NGSIM) dataset. The tools are originally developed by Stanford Intelligent Systems Laboratory (SISL).  
 Please check their github repositories on https://github.com/sisl
 
+## Demo: What these set of tools can do?
+(media/single_agent_gail.gif)
+
 ## Why do we need this recollection?
 Successful running the tools for dealing with NGSIM requires packages which are mutually dependent but scattered in different repositories. Since each repository undergoes active development, directly cloning the master branch of the repositories results in version conflicts, which are, trust me, frustrating.
 
