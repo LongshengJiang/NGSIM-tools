@@ -62,11 +62,13 @@ sudo apt-get install libavdevice-ffmpeg56
 ```
 Open julia by typing `julia` in your terminal. Make sure the version of julia should be v0.6.2.
 ```julia
-Pkg.add("StaticArrays")
-Pkg.add("Reexport")
-Pkg.add("Colors")
-Pkg.add("DataFrames")
-Pkg.add("ElectronDisplay")
+julia
+>> Pkg.add("StaticArrays")
+>> Pkg.add("Reexport")
+>> Pkg.add("Colors")
+>> Pkg.add("DataFrames")
+>> Pkg.add("ElectronDisplay")
+>> quit()
 ```
 These commands will automatically create a new directory: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
 When adding the above packages, their dependencies are automatically downloaded. Hence, it may take a longer time. Be patient. 
@@ -112,13 +114,42 @@ unzip data.zip
 # Answer yes to any that ask to be replaced.
 ```
 Please remember to create trajectories from the raw data.
-```bash
+```julia
 # Create trajectories from the data
 julia
   >> using NGSIM
   >> convert_raw_ngsim_to_trajdatas()
   >> quit()
+# This may take very long time. Be patient.  
 ```
 
+#### Check package installation
+Check if the five packages are successfully installed.
+```julia
+>> using Vec
+# Wait to see any errors pop up. 
+>> using Records
+# Wait to see any errors pop up.
+>> using AutomotiveDrivingModels
+# Wait to see any errors pop up.
+>> using AutoViz
+# Wait to see any errors pop up.
+>> using NGSIM
+# Wait to see any errors pop up.
+```
+Furthermore, you can run tests on these packages.
+```julia
+>> Pkg.test("Vec")
+# Wait to see any errors pop up. 
+>> Pkg.test("Records")
+# Wait to see any errors pop up. 
+>> Pkg.test("AutomotiveDrivingModels")
+# Wait to see any errors pop up. 
+>> Pkg.test("AutoViz")
+# Wait to see any errors pop up. 
+>> Pkg.test("NGSIM")
+# Wait to see any errors pop up. 
+```
+If all the tests passed, you can now start to follow the tutorials to learn the tools. 
 
-
+### Tutorials
