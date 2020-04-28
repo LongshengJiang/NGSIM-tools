@@ -154,10 +154,10 @@ Furthermore, you can run tests on these packages.
 If all the tests passed, you can now start to follow the tutorials to learn the tools. 
 
 ### Tutorials
-I assume you use your julia terminal (REPL) to practice on the tutorials. You need to go to your julia by
+I assume you use your julia terminal (REPL) to practice on the tutorials. You need to go to your julia by typing 
 ```bash
 julia
 ```
-Then, you go to the folder `\tutorials\` on this webpage and start your learning from there. I hope your learning journey is much smoother than mine. 
+in the terminal. Then, on this webpage you go to the folder `\tutorials\` and start your learning from there. I hope your learning journey is much smoother than mine. 
 
 ![julia-welcome](media/julia_welcome.png)
