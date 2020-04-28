@@ -67,6 +67,7 @@ julia
 >> Pkg.add("Reexport")
 >> Pkg.add("Colors")
 >> Pkg.add("DataFrames")
+>> Pkg.add("Parameters")
 >> Pkg.add("ElectronDisplay")
 >> quit()
 ```
