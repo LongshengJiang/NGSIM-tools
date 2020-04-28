@@ -70,7 +70,7 @@ julia
 >> Pkg.add("ElectronDisplay")
 >> quit()
 ```
-These commands will automatically create a new directory: `~\.julia\v0.6\` This directory is important. It is where all your packages are saved. 
+These commands will automatically create a new directory: `~/.julia/v0.6/` This directory is important. It is where all your packages are saved. 
 When adding the above packages, their dependencies are automatically downloaded. Hence, it may take a longer time. Be patient. 
 
 #### Install the NGSIM-tools packages locally
@@ -87,18 +87,18 @@ Open the downloaded `NGSIM-tools/zipped_packages` folder.
 ```bash
 cd ~/Downloads/NGSIM-tools/zipped_packages
 ```
-Recall when we used `Pkg.add()` in julia, julia automatically created a directory `~\.julia\v0.6\` to place the packages. We will unzip the newly downloaded files directly to that directory. In your terminal, type
+Recall when we used `Pkg.add()` in julia, julia automatically created a directory `~/.julia/v0.6/` to place the packages. We will unzip the newly downloaded files directly to that directory. In your terminal, type
 ```bash
 # unzip Vec.zip
-unzip ~/Downloads/NGSIM-tools/zipped_packages/Vec.zip -d ~\.julia\v0.6\
+unzip ~/Downloads/NGSIM-tools/zipped_packages/Vec.zip -d ~/.julia/v0.6/
 # unzip Records.zip
-unzip ~/Downloads/NGSIM-tools/zipped_packages/Records.zip -d ~\.julia\v0.6\
+unzip ~/Downloads/NGSIM-tools/zipped_packages/Records.zip -d ~/.julia/v0.6/
 # unzip AutomotiveDrivingModels.zip
-unzip ~/Downloads/NGSIM-tools/zipped_packages/AutomotiveDrivingModels.zip -d ~\.julia\v0.6\
+unzip ~/Downloads/NGSIM-tools/zipped_packages/AutomotiveDrivingModels.zip -d ~/.julia/v0.6/
 # unzip AutoViz.zip
-unzip ~/Downloads/NGSIM-tools/zipped_packages/AutoViz.zip -d ~\.julia\v0.6\
+unzip ~/Downloads/NGSIM-tools/zipped_packages/AutoViz.zip -d ~/.julia/v0.6/
 # unzip NGSIM.zip
-unzip ~/Downloads/NGSIM-tools/zipped_packages/NGSIM.zip -d ~\.julia\v0.6\
+unzip ~/Downloads/NGSIM-tools/zipped_packages/NGSIM.zip -d ~/.julia/v0.6/
 ```
 The above commands work like `Pkg.add()` in julia, I guess but not sure. 
 
