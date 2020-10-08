@@ -161,3 +161,12 @@ julia
 in the terminal. Then, on this webpage you go to the folder `\tutorials\` and start your learning from there. I hope your learning journey is much smoother than mine. 
 
 ![julia-welcome](media/julia_welcome.png)
+
+### Using an Editor to work with Julia
+I personally don't think working with Julia in the terminal is convenient and cool.I prefer using an color coded editor or, if possible, an full functioning IDE.
+While the latest version of Julia has these tools available, people who are stuck with Julia v0.6 are not so lucky. We have to use OLD versions of editors and so far I have not find a debugger for Julia v0.6. If you know one, please email me at longshj@g.clemson.edu. I really appreciate your help. 
+Here are my selection of tools after much research on the internet.
+
+I use Atom v1.27.0. You can find this old version here: [https://github.com/atom/atom/releases/tag/v1.27.0](https://github.com/atom/atom/releases/tag/v1.27.0). I use ubuntu 16.04, hence, I downloaded `atom-amd64.deb`. You can choose the files according to your platform. 
+
+I then go to `Edit`--> `Preference
