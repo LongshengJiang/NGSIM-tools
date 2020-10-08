@@ -169,5 +169,10 @@ Here are my selection of tools after much research on the internet.
 
 I use Atom v1.27.0. You can find this old version here: [https://github.com/atom/atom/releases/tag/v1.27.0](https://github.com/atom/atom/releases/tag/v1.27.0). I use ubuntu 16.04, hence, I downloaded `atom-amd64.deb`. You can choose the files according to your platform. 
 
-I then install the tools for using julia. I use uber-juno, but we need to be carefull about the versions. We cannot directly use the latest version. To add the juno tools, go to`Edit`--> `Preference`. Here on a list of items, select `Install`. In the search box, input `uber_juno@0.3.0`. Find this result and click on `install`. This step would install several packages, but you might have an error regarding installing `julia-client'. We cannot use the default version of this package. I tried several versions and settle at `julia_client@0.8.10`. You put this string in the search box. Find this result and install. So far you would be set. I attach a summary of the packages here for your convenience. 
+I then install the tools for using julia. I use uber-juno, but we need to be carefull about the versions. We cannot directly use the latest version. To add the juno tools, go to`Edit`--> `Preference`. Here on a list of items, select `Install`. In the search box, input `uber_juno@0.3.0`. Find this result and click on `install`. This step would install several packages, but you might have an error regarding installing `julia-client`. We cannot use the default version of this package. I tried several versions and settle at `julia_client@0.8.10`. You put this string in the search box. Find this result and install. So far you would be set. I attach a summary of the packages here for your convenience. 
+`indent-detective@0.4.0`
+`ink@0.12.5`
+`julia-client@0.8.10`
+`latex-completions@0.3.6`
+`uber-juno@0.3.0`
 
