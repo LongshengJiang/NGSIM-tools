@@ -153,7 +153,7 @@ Furthermore, you can run tests on these packages.
 ```
 If all the tests passed, you can now start to follow the tutorials to learn the tools. 
 
-### Tutorials
+## Tutorials
 I assume you use your julia terminal (REPL) to practice on the tutorials. You need to go to your julia by typing 
 ```bash
 julia
@@ -162,11 +162,12 @@ in the terminal. Then, on this webpage you go to the folder `\tutorials\` and st
 
 ![julia-welcome](media/julia_welcome.png)
 
-### Using an Editor to work with Julia
+## Using an Editor to work with Julia
 I personally don't think working with Julia in the terminal is convenient and cool.I prefer using an color coded editor or, if possible, an full functioning IDE.
 While the latest version of Julia has these tools available, people who are stuck with Julia v0.6 are not so lucky. We have to use OLD versions of editors and so far I have not find a debugger for Julia v0.6. If you know one, please email me at longshj@g.clemson.edu. I really appreciate your help. 
 Here are my selection of tools after much research on the internet.
 
 I use Atom v1.27.0. You can find this old version here: [https://github.com/atom/atom/releases/tag/v1.27.0](https://github.com/atom/atom/releases/tag/v1.27.0). I use ubuntu 16.04, hence, I downloaded `atom-amd64.deb`. You can choose the files according to your platform. 
 
-I then go to `Edit`--> `Preference
+I then install the tools for using julia. I use uber-juno, but we need to be carefull about the versions. We cannot directly use the latest version. To add the juno tools, go to`Edit`--> `Preference`. Here on a list of items, select `Install`. In the search box, input `uber_juno@0.3.0`. Find this result and click on `install`. This step would install several packages, but you might have an error regarding installing `julia-client'. We cannot use the default version of this package. I tried several versions and settle at `julia_client@0.8.10`. You put this string in the search box. Find this result and install. So far you would be set. I attach a summary of the packages here for your convenience. 
+
