@@ -181,5 +181,5 @@ I then install the packages of Atom for using julia. I use uber-juno, but we nee
 Hopefully, you will see an interface like this when you open Atom
 ![atom_julia](media/atom_julia.png)
 
-Last step, don't forget to change the path to julia binary in julia-client. We want want the path to be the julia v0.6 we have downloaded previously. We need to find the setting of julia-client by `Edit` --> `Preference` --> `packages`. Then go find julia-client, and presss the setting icon (a gear). You would see the screen looks like this.
+Last step, don't forget to change the path to julia binary in julia-client. We want want the path to be the julia v0.6 we have downloaded previously. We need to find the setting of julia-client by `Edit` --> `Preference` --> `packages`. Then go find julia-client, and presss the setting icon (a gear). You would see the screen looking like this.
 ![julia_client_change_path](media/julia_client_change_path.png)
