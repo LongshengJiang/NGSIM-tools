@@ -103,6 +103,8 @@ unzip ~/Downloads/NGSIM-tools/zipped_packages/NGSIM.zip -d ~/.julia/v0.6/
 ```
 The above commands work like `Pkg.add()` in julia, I guess but not sure. 
 
+[Note: The module name has version numbers, must be removed; for example, Vec.jl-0.6.0 should be change to Vec. I need to find way to do this.]
+
 #### Download NGSIM data
 Go to the directory where the data should be placed.
 ```bash
