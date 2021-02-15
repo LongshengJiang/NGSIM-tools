@@ -69,6 +69,7 @@ julia
 >> Pkg.add("DataFrames")
 >> Pkg.add("Parameters")
 >> Pkg.add("ElectronDisplay")
+>> Pkg.add("Distributions")
 >> quit()
 ```
 These commands will automatically create a new directory: `~/.julia/v0.6/` This directory is important. It is where all your packages are saved. 
