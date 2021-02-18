@@ -188,10 +188,15 @@ I then install the packages of Atom for using julia. I use uber-juno, but we nee
 
     - atom v1.27.0
     - indent-detective@0.4.0
-    - ink@0.10.11
+    - ink@0.10.12
     - julia-client@0.8.10
     - latex-completions@0.3.6
     - uber-juno@0.3.0
+
+You can manage the atom packages using `apm` command. For example, if you want to install `ink@0.10.12`, in your terminal, you type:
+```bash
+apm install ink@0.10.12
+```
 
 Hopefully, you will see an interface like this when you open Atom
 ![atom_julia](media/atom_julia.png)
