@@ -188,7 +188,7 @@ I then install the packages of Atom for using julia. I use uber-juno, but we nee
 
     - atom v1.27.0
     - indent-detective@0.4.0
-    - ink@0.12.5
+    - ink@0.10.11
     - julia-client@0.8.10
     - latex-completions@0.3.6
     - uber-juno@0.3.0
