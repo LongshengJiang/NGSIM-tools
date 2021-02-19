@@ -138,5 +138,26 @@ AutomotiveDrivingModels.LaneBoundary(:broken, :white)
 julia> ROADWAY_101.segments[1].lanes[1].boundary_right
 AutomotiveDrivingModels.LaneBoundary(:solid, :white)
 ```
-Great, they can tell us the line shape and color of the boundaries. We know solid line is at road edges. From the information above, we see (segment 3, lane 1) is on the right edge of the middle section of the road. 
+Great, they can tell us the line shape and color of the boundaries. We know solid line is at road edges. From the information above, we see (segment 3, lane 1) is on the right edge of the middle section of the road. Let us check the bourndaries of the two connected lanes: (segment 2, lane 1) and (segment 5, lane 1).
+```julia
+julia> ROADWAY_101.segments[3].lanes[1].tag
+LaneTag(2, 1)
 
+julia> ROADWAY_101.segments[3].lanes[1].boundary_left
+AutomotiveDrivingModels.LaneBoundary(:solid, :white)
+
+julia> ROADWAY_101.segments[3].lanes[1].boundary_right
+AutomotiveDrivingModels.LaneBoundary(:solid, :white)
+```
+We see (segment 2, lane 1), which is at the downstream of (segment 3, lane 1), has both boundaries being solid line, hence it is a ramp. Since it is at the downstream, it is a off-ramp as in the picture. We do the samething for the upper stream.
+```julia
+julia> ROADWAY_101.segments[5].lanes[1].tag
+LaneTag(5, 1)
+
+julia> ROADWAY_101.segments[5].lanes[1].boundary_left
+AutomotiveDrivingModels.LaneBoundary(:solid, :white)
+
+julia> ROADWAY_101.segments[5].lanes[1].boundary_right
+AutomotiveDrivingModels.LaneBoundary(:solid, :white)
+```
+Based on this information, (segment 5, lane 1) has to be the on-ramp.
