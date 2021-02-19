@@ -15,7 +15,7 @@ julia> fieldnames(ROADWAY_101)
 1-element Array{Symbol,1}:
  :segments
 ```
-We can keep using `fieldnames` to go deeper.
+We can keep using `fieldnames` and go deeper.
 ```julia
 julia> fieldnames(ROADWAY_101.segments)
 0-element Array{Symbol,1}
