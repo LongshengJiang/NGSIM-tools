@@ -32,7 +32,12 @@ julia> fieldnames(ROADWAY_101.segments[1])
  :id   
  :lanes
 ```
-Go deeper.
+We can check the id of this segment by typing
+```julia
+julia> ROADWAY_101.segments[1].id
+3
+```
+We know this is the segment 3. We can further go deeper to explore these fields.
 ```julia
 julia> fieldnames(ROADWAY_101.segments[1].id)
 0-element Array{Symbol,1}
@@ -46,3 +51,17 @@ julia> size(ROADWAY_101.segments[1].id)
 julia> size(ROADWAY_101.segments[1].lanes)
 (6,)
 ```
+Hence, we know the first segment of `RAODWAY_101` has 6 lanes. This segment must be part of the middle section of the road in the above picture. We want to see what the fields of the lanes are.
+```julia
+julia> fieldnames(ROADWAY_101.segments[1].lanes[1])
+8-element Array{Symbol,1}:
+ :tag           
+ :curve         
+ :width         
+ :speed_limit   
+ :boundary_left 
+ :boundary_right
+ :exits         
+ :entrances   
+ ```
+ Here we 
