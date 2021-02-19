@@ -250,4 +250,8 @@ julia> ROADWAY_101.segments[1].lanes[6].exits[1].target
 RoadIndex({1, 0.000000}, {1, 5})
 ```
 We find segment 1 is indeed at the downstream of segment 3. with (segment 3, lane 2)--(segment 1, lane 1),...,(segment 3, lane 6)--(segment 1, lane 5).
-This is illustrated in the following picture.
+
+Here we want to make it clear that the in the origninal data of NGSIM, the lane labeling is different. When using the function `load_ngsim_trajdata` in `NGSIM` module, we get the filtered traffic data which contain all the columns of the original NGSIM dataset. One column named `:lane` which records the lane ID. This labeling is NOT changed by the function `load_ngsim_trajdata'. The labeling is as follows.
+
+
+
