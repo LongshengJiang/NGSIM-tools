@@ -182,37 +182,27 @@ We can compare the globale positions of different lanes on segment 3.
 ```julia
 julia> ROADWAY_101.segments[1].lanes[1].tag
 LaneTag(3, 1)
-
 julia> ROADWAY_101.segments[1].lanes[2].tag
 LaneTag(3, 2)
-
 julia> ROADWAY_101.segments[1].lanes[3].tag
 LaneTag(3, 3)
-
 julia> ROADWAY_101.segments[1].lanes[4].tag
 LaneTag(3, 4)
-
 julia> ROADWAY_101.segments[1].lanes[5].tag
 LaneTag(3, 5)
-
 julia> ROADWAY_101.segments[1].lanes[6].tag
 LaneTag(3, 6)
 
 julia> ROADWAY_101.segments[1].lanes[1].curve[1]
 CurvePt({1966396.442, 570884.431, -0.690}, 0.000, -0.000, -0.000)
-
 julia> ROADWAY_101.segments[1].lanes[2].curve[1]
 CurvePt({1966399.668, 570887.728, -0.739}, 0.000, -0.000, -0.000)
-
 julia> ROADWAY_101.segments[1].lanes[3].curve[1]
 CurvePt({1966402.299, 570890.065, -0.662}, 0.000, -0.000, -1.564)
-
 julia> ROADWAY_101.segments[1].lanes[4].curve[1]
 CurvePt({1966404.529, 570892.650, -0.752}, 0.000, -0.000, 0.007)
-
 julia> ROADWAY_101.segments[1].lanes[5].curve[1]
 CurvePt({1966407.137, 570894.664, -0.722}, 0.000, -0.000, -0.007)
-
 julia> ROADWAY_101.segments[1].lanes[6].curve[1]
 CurvePt({1966409.684, 570897.257, -0.701}, 0.000, 0.000, -0.045)
 ```
