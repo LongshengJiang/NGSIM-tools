@@ -213,25 +213,25 @@ We plot these points out from lane 1 to lane 6, here is what we got
 We can see lanes on segment 3 are placed one next to another from lane 1 to lane 6, which is from right to left when following the direction of the road.
 We now want to see what is connected at the upstream of segment 3. Let us run
 ```julia
+julia> ROADWAY_101.segments[1].id
+3
 julia> ROADWAY_101.segments[1].lanes[1].entrances[1].target
 RoadIndex({227, 1.000000}, {5, 1})
-
 julia> ROADWAY_101.segments[1].lanes[2].entrances[1].target
 RoadIndex({564, 1.000000}, {4, 1})
-
 julia> ROADWAY_101.segments[1].lanes[3].entrances[1].target
 RoadIndex({559, 1.000000}, {4, 2})
-
 julia> ROADWAY_101.segments[1].lanes[4].entrances[1].target
 RoadIndex({559, 1.000000}, {4, 3})
-
 julia> ROADWAY_101.segments[1].lanes[5].entrances[1].target
 RoadIndex({559, 1.000000}, {4, 4})
-
 julia> ROADWAY_101.segments[1].lanes[6].entrances[1].target
 RoadIndex({554, 1.000000}, {4, 5})
 ```
-We find segment 4 is indeed at the upstream of segment 3, with (segment 4, lane 1)--(segment 3, lane 2),...,(segment 4, lane 5)--(segment 3, lane 6)  
+We find segment 4 is indeed at the upstream of segment 3, with (segment 4, lane 1)--(segment 3, lane 2),...,(segment 4, lane 5)--(segment 3, lane 6).
+This is illustrated in the following picture.
+
+<img src="./images/seg4_3.png" width="500">
 
 ```julia
 julia> ROADWAY_101.segments[1].id
@@ -249,4 +249,5 @@ RoadIndex({1, 0.000000}, {1, 4})
 julia> ROADWAY_101.segments[1].lanes[6].exits[1].target
 RoadIndex({1, 0.000000}, {1, 5})
 ```
-We find segment 1 is indeed at the downstream of segment 3. 
+We find segment 1 is indeed at the downstream of segment 3. with (segment 3, lane 2)--(segment 1, lane 1),...,(segment 3, lane 6)--(segment 1, lane 5).
+This is illustrated in the following picture.
