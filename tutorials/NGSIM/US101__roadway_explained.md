@@ -125,5 +125,18 @@ julia> fieldnames(ROADWAY_101.segments[1].lanes[1])
  :entrances   
  ```
  The lane has information about its left and right boundary. Let us see what they are.
+ ```julia
+ julia> ROADWAY_101.segments[1].id
+3
+
+julia> ROADWAY_101.segments[1].lanes[1].tag
+LaneTag(3, 1)
  
- 
+julia> ROADWAY_101.segments[1].lanes[1].boundary_left
+AutomotiveDrivingModels.LaneBoundary(:broken, :white)
+
+julia> ROADWAY_101.segments[1].lanes[1].boundary_right
+AutomotiveDrivingModels.LaneBoundary(:solid, :white)
+```
+Great, they can tell us the line shape and color of the boundaries. We know solid line is at road edges. From the information above, we see (segment 3, lane 1) is on the right edge of the middle section of the road. 
+
