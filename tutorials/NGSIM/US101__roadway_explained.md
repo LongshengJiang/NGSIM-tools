@@ -231,7 +231,7 @@ RoadIndex({554, 1.000000}, {4, 5})
 We find segment 4 is indeed at the upstream of segment 3, with (segment 4, lane 1)--(segment 3, lane 2),...,(segment 4, lane 5)--(segment 3, lane 6).
 This is illustrated in the following picture.
 
-<img src="./images/seg4_3.png" width="500">
+<img src="./images/segement4_3.png" width="500">
 
 ```julia
 julia> ROADWAY_101.segments[1].id
