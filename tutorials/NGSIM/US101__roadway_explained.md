@@ -207,4 +207,5 @@ julia> ROADWAY_101.segments[1].lanes[6].curve[1]
 CurvePt({1966409.684, 570897.257, -0.701}, 0.000, 0.000, -0.045)
 ```
 We plot these points out from lane 1 to lane 6, here is what we got
-<img src="./images/seg3_lane1_6.png" width="100" height="100">
+
+<img src="./images/seg3_lane1_6.png" width="500" height="500">
