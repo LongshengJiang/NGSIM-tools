@@ -51,7 +51,7 @@ julia> size(ROADWAY_101.segments[1].id)
 julia> size(ROADWAY_101.segments[1].lanes)
 (6,)
 ```
-Hence, we know the first segment of `RAODWAY_101` has 6 lanes. This segment must be part of the middle section of the road in the above picture. We want to see what the fields of the lanes are.
+Hence, we know the first segment of `RAODWAY_101` has 6 lanes. This segment (segment 3) must be part of the middle section of the road in the above picture. We want to see what the fields of the lanes are.
 ```julia
 julia> fieldnames(ROADWAY_101.segments[1].lanes[1])
 8-element Array{Symbol,1}:
@@ -64,4 +64,66 @@ julia> fieldnames(ROADWAY_101.segments[1].lanes[1])
  :exits         
  :entrances   
  ```
- Here we 
+ Here we can find the tag of the lane. Let's see what a tag is.
+ ```julia
+julia> fieldnames(ROADWAY_101.segments[1].lanes[1].tag)
+2-element Array{Symbol,1}:
+ :segment
+ :lane  
+ ```
+ A tag tells us the segment number and the lane number. 
+ Let's see what `:exits` and `:entrances` tell us.
+ ```julia
+ julia> fieldnames(ROADWAY_101.segments[1].lanes[1].exits[1])
+3-element Array{Symbol,1}:
+ :downstream
+ :mylane    
+ :target    
+
+julia> fieldnames(ROADWAY_101.segments[1].lanes[1].exits[1].target)
+2-element Array{Symbol,1}:
+ :ind
+ :tag
+ 
+ julia> fieldnames(ROADWAY_101.segments[1].lanes[1].entrances[1])
+3-element Array{Symbol,1}:
+ :downstream
+ :mylane    
+ :target    
+
+julia> fieldnames(ROADWAY_101.segments[1].lanes[1].entrances[1].target)
+2-element Array{Symbol,1}:
+ :ind
+ :tag
+ ```
+ We can see `:exits` and `:entrances` tells us the tags of the lanes connecting to the exit and entrance of this lane. Let's see an example.
+ ```julia
+julia> ROADWAY_101.segments[1].lanes[1].tag
+LaneTag(3, 1)
+
+julia> ROADWAY_101.segments[1].lanes[1].exits
+1-element Array{AutomotiveDrivingModels.LaneConnection,1}:
+ LaneConnection(D, CurveIndex(825, 1.000), RoadIndex({1, 0.000000}, {2, 1})
+
+julia> ROADWAY_101.segments[1].lanes[1].entrances
+1-element Array{AutomotiveDrivingModels.LaneConnection,1}:
+ LaneConnection(U, CurveIndex(1, 0.000), RoadIndex({227, 1.000000}, {5, 1})
+ ```
+ We see the current lane is (segment 3, lane 1). At its downstream is (segment 2, lane 1). At its upstream is (segment 5, lane 1). So where is segment 2 and 5 in the picture?
+ 
+We find here 
+```julia
+julia> fieldnames(ROADWAY_101.segments[1].lanes[1])
+8-element Array{Symbol,1}:
+ :tag           
+ :curve         
+ :width         
+ :speed_limit   
+ :boundary_left 
+ :boundary_right
+ :exits         
+ :entrances   
+ ```
+ The lane has information about its left and right boundary. Let us see what they are.
+ 
+ 
