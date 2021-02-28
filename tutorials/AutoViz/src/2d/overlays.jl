@@ -169,9 +169,9 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
         v = veh_ego.state.v
         len_ego = veh_ego.def.length
         # show the ego info
-        drawtext(@sprintf("ego t:   %10.3f", t), yₒ + 0*Δy, rendermodel, textparams)
-        drawtext(@sprintf("ego ϕ:   %10.3f", ϕ), yₒ + 1*Δy, rendermodel, textparams)
-        drawtext(@sprintf("ego v:   %10.3f", v), yₒ + 2*Δy, rendermodel, textparams)
+        drawtext(@sprintf("ego t:   %10.3f m", t), yₒ + 0*Δy, rendermodel, textparams)
+        drawtext(@sprintf("ego ϕ:   %10.3f rad", ϕ), yₒ + 1*Δy, rendermodel, textparams)
+        drawtext(@sprintf("ego v:   %10.3f m/s", v), yₒ + 2*Δy, rendermodel, textparams)
 
         fore_L = get_neighbor_fore_along_left_lane(scene, vehicle_index, roadway, VehicleTargetPointFront(), VehicleTargetPointRear(), VehicleTargetPointFront())
         if fore_L.ind != 0
@@ -181,8 +181,8 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             v_oth = veh_oth.state.v
             Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_L, overlay.line_width))
-            drawtext(@sprintf("d fore left:   %10.3f", fore_L.Δs), yₒ + 3*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv fore left:   %10.3f", Δv), yₒ + 4*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d fore left:   %10.3f m", fore_L.Δs), yₒ + 3*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv fore left:   %10.3f m/s", Δv), yₒ + 4*Δy, rendermodel, textparams)
         end
 
         fore_M = get_neighbor_fore_along_lane(scene, vehicle_index, roadway, VehicleTargetPointFront(), VehicleTargetPointRear(), VehicleTargetPointFront())
@@ -193,8 +193,8 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             v_oth = veh_oth.state.v
             Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_M, overlay.line_width))
-            drawtext(@sprintf("d fore middle: %10.3f", fore_M.Δs), yₒ + 5*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv fore middle:   %10.3f", Δv), yₒ + 6*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d fore middle: %10.3f m", fore_M.Δs), yₒ + 5*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv fore middle:   %10.3f m/s", Δv), yₒ + 6*Δy, rendermodel, textparams)
         end
 
         fore_R = get_neighbor_fore_along_right_lane(scene, vehicle_index, roadway, VehicleTargetPointFront(), VehicleTargetPointRear(), VehicleTargetPointFront())
@@ -205,8 +205,8 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             v_oth = veh_oth.state.v
             Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_R, overlay.line_width))
-            drawtext(@sprintf("d fore right:  %10.3f", fore_R.Δs), yₒ + 7*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv fore right:   %10.3f", Δv), yₒ + 8*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d fore right:  %10.3f m", fore_R.Δs), yₒ + 7*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv fore right:   %10.3f m/s", Δv), yₒ + 8*Δy, rendermodel, textparams)
         end
 
         rear_L = get_neighbor_rear_along_left_lane(scene, vehicle_index, roadway, VehicleTargetPointRear(), VehicleTargetPointFront(), VehicleTargetPointRear())
@@ -215,10 +215,10 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             A = get_rear(veh_ego)
             B = get_front(veh_oth)
             v_oth = veh_oth.state.v
-            Δv = v - v_oth
+            Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_L, overlay.line_width))
-            drawtext(@sprintf("d rear left:   %10.3f", rear_L.Δs), yₒ + 9*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv rear left:   %10.3f", Δv), yₒ + 10*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d rear left:   %10.3f m", rear_L.Δs), yₒ + 9*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv rear left:   %10.3f m/s", Δv), yₒ + 10*Δy, rendermodel, textparams)
         end
 
         rear_M = get_neighbor_rear_along_lane(scene, vehicle_index, roadway, VehicleTargetPointRear(), VehicleTargetPointFront(), VehicleTargetPointRear())
@@ -227,10 +227,10 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             A = get_rear(veh_ego)
             B = get_front(veh_oth)
             v_oth = veh_oth.state.v
-            Δv = v - v_oth
+            Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_M, overlay.line_width))
-            drawtext(@sprintf("d rear middle: %10.3f", rear_M.Δs), yₒ + 11*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv rear middle:   %10.3f", Δv), yₒ + 12*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d rear middle: %10.3f m", rear_M.Δs), yₒ + 11*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv rear middle:   %10.3f m/s", Δv), yₒ + 12*Δy, rendermodel, textparams)
         end
 
         rear_R = get_neighbor_rear_along_right_lane(scene, vehicle_index, roadway, VehicleTargetPointRear(), VehicleTargetPointFront(), VehicleTargetPointRear())
@@ -239,10 +239,10 @@ function render!(rendermodel::RenderModel, overlay::NeighborsOverlay, scene::Sce
             A = get_rear(veh_ego)
             B = get_front(veh_oth)
             v_oth = veh_oth.state.v
-            Δv = v - v_oth
+            Δv = v_oth - v
             add_instruction!(rendermodel, render_line_segment, (A.x, A.y, B.x, B.y, overlay.color_R, overlay.line_width))
-            drawtext(@sprintf("d rear right:  %10.3f", rear_R.Δs), yₒ + 13*Δy, rendermodel, textparams)
-            drawtext(@sprintf("Δv rear right:   %10.3f", Δv), yₒ + 14*Δy, rendermodel, textparams)
+            drawtext(@sprintf("d rear right:  %10.3f m", rear_R.Δs), yₒ + 13*Δy, rendermodel, textparams)
+            drawtext(@sprintf("Δv rear right:   %10.3f m/s", Δv), yₒ + 14*Δy, rendermodel, textparams)
         end
     end
 
