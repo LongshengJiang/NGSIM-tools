@@ -37,7 +37,8 @@ mutable struct CarFollowCamera{I} <: Camera
     targetid::I
     zoom::Float64 # [pix/meter]
     rotation::Float64 # [rad]
-
+    # However, the rotation angle cannot be greater than 45 degree, otherwise, the lines and vehicles cannot be seen for some reasons I don't know. 
+    
     CarFollowCamera{I}(targetid::I, zoom::Float64=3.0, rotation::Float64 = 0.0) where {I} = new(targetid, zoom, rotation)
 end
 
