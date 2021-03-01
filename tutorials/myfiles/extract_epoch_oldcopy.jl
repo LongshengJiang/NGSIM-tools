@@ -41,32 +41,10 @@
 
 # The duration of an epoch
 struct EpochDuration
-    egoid::Int64                  # The id of the ego vehicle
-    startframe::Int64             # The frame at which an epoch starts
-    after_duration::Int64         # The duration after the start frame
-    before_duration::Int64        # The duration before the start frame
-end
-#
-# The information after a triggering event.
-mutable struct InfoAfterTrigger
-        egoid::Int64                    # The id of the ego vehicle
-        triggerframe::Int64             # The frame ath which event-triggering happens
-        trigger_ind::Int64              # The n-th trigger
-        triggered::Bool                 # If the event is at least triggered once
-        laneids::Array{Int64, 1}        # The list of lane ids after the triggering.
-        ego_v::Array{Float64, 1}        # The list of speed of the ego vehicle
-        fore_v::Array{Float64, 1}       # The list of speed of the front vehicle
-        duration::Int64                 # The duration after event triggering
-        InfoAfterTrigger(;egoid::Int64 = 0,
-                        triggerframe::Int64 = 0,
-                        trigger_ind::Int64 = 0,
-                        triggered::Bool = false,
-                        laneids::Array{Int64, 1} = Array{Int64, 1}(),
-                        ego_v::Array{Float64, 1} = Array{Float64, 1}(),
-                        fore_v::Array{Float64, 1} = Array{Float64, 1}(),
-                        duration::Int64 = 50) = new(egoid, triggerframe, trigger_ind,
-                                                    triggered, laneids, ego_v,
-                                                    fore_v, duration)
+    egoid::Int16                  # The id of the ego vehicle
+    startframe::Int16             # The frame at which an epoch starts
+    after_duration::Int16         # The duration after the start frame
+    before_duration::Int16        # The duration before the start frame
 end
 
 # In this program, I define the following useful constants:
@@ -419,19 +397,14 @@ function lanechanges_dueto_slowlead()
     n_triggers = 0
     n_lanechanges = 0
     n_lanekeeps = 0
-    n_notchange = 0
-    n_slow_lead = 0
     n_abortedchanges = 0
-    n_laneids_notempty = 0
     # Assign constant parameters.
     SAMPLE_DURATION = 5
-    EVENT_SPEPARATION = 20
-    LOOK_AHEAD = 20
+    EVENT_SPEPARATION = 50
+    GOBACK_INTERVAL = 20
+    LANECHANGE_SEARCH_INTERVEL = 50
     #For a vehicle in all the vehicles:
     for egoid in keys(tdraw_my.car2start)  # tdraw_my is loaded by using MyNGSIM
-        # Define info_after_trigger to contain the related information after an event-triggering
-        # InfoAfterTrigger is defined in this file
-        info_after_trigger = InfoAfterTrigger(egoid = egoid);
         # Get the starting row of the ego vehicle in tdraw_my
         ego_start_row = tdraw_my.car2start[egoid];
         # Get the total number of frames of the ego vehicle in tdraw_my
@@ -513,63 +486,35 @@ function lanechanges_dueto_slowlead()
                                                     aggregate_method = "mean" );
                     veh22_speed = veh22_traffic_info[:speed];
                 end
-                # We check if the event has been triggered (n_triggers >= 1).
-                # If the event has been triggered as least once, we start recording
-                # the after triggering information. We make sure to at most fill the duration.
-                if info_after_trigger.triggered && length(info_after_trigger.laneids) < info_after_trigger.duration
-                    # Push in the current lane id.
-                    push!(info_after_trigger.laneids, ego_current_laneid);
-                    # Push in the current ego speed.
-                    push!(info_after_trigger.ego_v, ego_speed);
-                    # Push in the current lead speed.
-                    push!(info_after_trigger.fore_v, veh1_speed);
-                end
-                # ================================================================
-                # Here we model the event-triggering as the following if-statement.
-                # ================================================================
+                # Here we model the event-triggering with the if-statement.
                 # If (veh 1 is slower than veh 0) and (veh 2 or veh 22 is faster than veh 1):
                 if ego_speed - veh1_speed >= SPEED_DIFF_THRESHOLD && ( veh2_speed - veh1_speed >= SPEED_DIFF_THRESHOLD || veh22_speed - veh1_speed >= SPEED_DIFF_THRESHOLD )
                     # Only if this the triggering frame is far enough from the previous event-triggering frame, can
                     # we claim a new event.
                     # If the separation is enough, we have a new event.
                     if ego_frame - ego_lastevent_frame > EVENT_SPEPARATION
-                        n_triggers += 1;
-                        
-                        # We first process the information in info_after_trigger for the previous recording
-                        if !isempty(info_after_trigger.laneids)
-                            n_laneids_notempty += 1;
-                            # Checking if a lane change or a lane keep was made
-                            Δn_lanedecisions=lane_change_or_keep(info_after_trigger);
-                            # Update the counters
-                            n_lanechanges += Δn_lanedecisions[1];
-                            n_lanekeeps += Δn_lanedecisions[2];
-                            n_abortedchanges += Δn_lanedecisions[3];
-                            n_notchange += Δn_lanedecisions[4];
-                            n_slow_lead += Δn_lanedecisions[5];
+                        # Add one event
+                        n_triggers += 1
+                        # Check if the current lane id is the same as the immdiately previous lane id.
+                        if ego_current_laneid != tdraw_my.df[ego_row_ind - 1, :lane] # this means a lane change
+                            # Further if the current lane id is the same as the to the previous lane ids in 2s,
+                            # we know this is an aborted lane change.
+                            goingback = false
+                            for i = 1:GOBACK_INTERVAL
+                                goingback = goingback || (ego_current_laneid == tdraw_my.df[ego_row_ind - i, :lane])
+                            end
+                            if goingback    # this means an aborted lane change
+                                n_abortedchanges += 1
+                                n_lanechanges -= 1
+                            else            # this means this is a lane change
+                                n_lanechanges += 1
+                            end
+                        else  # this means the ego stays in the lane
+                                n_lanekeeps += 1;
                         end
-
-                        # We then reinitialize the info_after_trigger
-                        info_after_trigger = InfoAfterTrigger(egoid = egoid,
-                                                              triggerframe = ego_frame,
-                                                              trigger_ind = n_triggers,
-                                                              triggered = true);
                     end
                     # We update the event triggering frame.
                     ego_lastevent_frame = ego_frame;
-                end
-                # When the while-loop is about to end, we need to check the lane decisions from the last event trigger.
-                if ego_row_ind == ego_end_row_m
-                    if !isempty(info_after_trigger.laneids)
-                        n_laneids_notempty += 1;
-                        # Checking if a lane change or a lane keep was made
-                        Δn_lanedecisions=lane_change_or_keep(info_after_trigger);
-                        # Update the counters
-                        n_lanechanges += Δn_lanedecisions[1];
-                        n_lanekeeps += Δn_lanedecisions[2];
-                        n_abortedchanges += Δn_lanedecisions[3];
-                        n_notchange += Δn_lanedecisions[4];
-                        n_slow_lead += Δn_lanedecisions[5];
-                    end
                 end
             end
         end
@@ -577,86 +522,13 @@ function lanechanges_dueto_slowlead()
     # test code {
     # Print the total number of lane changes
     println(("total searched frames:", n_searched));
-    println(("total triggering events:", n_triggers));
-    println(("n_laneids_notempty", n_laneids_notempty));
+    println(("total triggering frames:", n_triggers));
     println(("total number of lane-changing", n_lanechanges));
     println(("total number of lane-keeping", n_lanekeeps));
     println(("total number of aborted lane change", n_abortedchanges));
-    println(("number of slow lead:", n_slow_lead));
-    println(("number of not change:", n_notchange));
     # test code }
     # Print the elapsed time.
     toc();
-end
-
-# """
-# Determine lane change or lane keep
-# """
-function lane_change_or_keep(info_after_trigger::InfoAfterTrigger)
-    # Initialize some counters
-    Δn_lanechanges = 0
-    Δn_lanekeeps = 0
-    Δn_abortedchanges = 0
-    Δn_notchange = 0
-    Δn_slow_lead = 0
-    # We determine if a lane change happens. A lane change is charaterized by
-    # 1) the ego moved to a new lane
-    # 2) the ego did not go back to the original lane quickly (abort the lane change)
-    #
-    # Scan the lane ids to see if they are the same.
-    if !isempty(info_after_trigger.laneids)
-        aftrg_laneids_len = length(info_after_trigger.laneids);
-        aftrg_current_laneid =  info_after_trigger.laneids[1];
-        for i = 2:aftrg_laneids_len
-            # If we find the lane id is not the same as the first one, that may be a lane change.
-            if info_after_trigger.laneids[i] != aftrg_current_laneid
-                Δn_lanechanges += 1
-                # We further check if this lane change is aborted
-                goingback = false;
-                for j = i:minimum([i + 20, aftrg_laneids_len])
-                    # If the vehicle goes back to the previous lane, that is an aborted change.
-                    goingback = goingback || (info_after_trigger.laneids[j] == aftrg_current_laneid);
-                end
-                # If the ego goes back to the current lane, the lane change is aborted.
-                if goingback
-                    # Add one lane-change abortion
-                    Δn_abortedchanges += 1
-                    # Abort the lane change
-                    Δn_lanechanges -= 1
-                else
-                    # Update the current lane to be this lane.
-                    aftrg_current_laneid = info_after_trigger.laneids[i]
-                end
-            end
-        end
-        #
-        # We determine if a lane-keeping happens. A lane-keeping is charaterized by
-        # 1) The ego did not change lane
-        # 2) The ego matched the speed of the slow lead vehicle.
-        # It is possible that the lead vehicle may speed up quickly, hence the ego
-        # aborts the lane change quickly. We do NOT consider this case.
-        #
-        changinglane = false
-        for i = 2:aftrg_laneids_len
-            changinglane = changinglane || (info_after_trigger.laneids[i] != info_after_trigger.laneids[1]);
-        end
-        # If the ego did not change lane,
-        if !changinglane
-            Δn_notchange += 1;
-            # If the lead vehicle is slowing down,
-            if info_after_trigger.fore_v[1] - info_after_trigger.fore_v[end] > SPEED_DIFF_THRESHOLD
-                Δn_slow_lead += 1;
-                # If the relative speed of the lead to the ego is small enough, it is a lane-keeping.
-                rel_speed_fore = info_after_trigger.fore_v - info_after_trigger.ego_v;
-                if minimum( abs.(rel_speed_fore) ) <= (SPEED_DIFF_THRESHOLD / 2)
-                    Δn_lanekeeps += 1;
-                end
-            end
-        end
-        Δn_lanedecisions= [Δn_lanechanges, Δn_lanekeeps, Δn_abortedchanges, Δn_notchange, Δn_slow_lead]
-    else
-        error("The laneids vector is empty.");
-    end
 end
 
 
@@ -762,7 +634,7 @@ function extract_epoch()
                     # While (veh 0 is in the current lane):
                     while ego_current_laneid == ego_old_laneid
                         # If (|speed of veh 1 - speed of veh 0| )
-                        if ego_speed - veh1_speed <= (SPEED_DIFF_THRESHOLD / 2)
+                        if ego_speed - veh1_speed <= (SPEED_DIFF_THRESHOLD ÷ 2)
                             # We make sure we the row indices do not exceed ego_end_row.
                             if ego_row_ind + 50 < ego_end_row
                                 ego_rowind_after = ego_row_ind + 50;
