@@ -204,4 +204,4 @@ Hopefully, you will see an interface like this when you open Atom
 Last step, don't forget to change the path to julia binary in julia-client. We want want the path to be the julia v0.6 we have downloaded previously. We need to find the setting of julia-client by `Edit` --> `Preference` --> `packages`. Then go find julia-client, and presss the setting icon (a gear). You would see the screen looking like this.
 ![julia_client_change_path](media/julia_client_change_path.png)
 
-I think having a debugger to work with would be perfect. However, currently, I could not get the native debugger in Juno to work with Julia v0.6.2. But I do find a less clean and powerful debugger online. Please refer to [](https://tnctsi.uthsc.edu/2019/01/03/julia-debugging-basics-by-gregory-farage/)
+I think having a debugger to work with would be perfect. However, currently, I could not get the native debugger in Juno to work with Julia v0.6.2. But I do find a less clean and powerful debugger online. Please refer to [https://tnctsi.uthsc.edu/2019/01/03/julia-debugging-basics-by-gregory-farage/](https://tnctsi.uthsc.edu/2019/01/03/julia-debugging-basics-by-gregory-farage/)
