@@ -33,7 +33,8 @@
 # The function dependence is
 #   extract_epoch
 #               |_ traffic_info_NGSIM
-#                                    |_ get_neighbor_speed
+#                                    |_ sample_neighbor_Δs_and_v!
+#                                    |___________________________|_get_neighbor_speed
 
 # In this program, I define the following data structures.
 #   EpochDuration
@@ -100,6 +101,83 @@ function get_neighbor_speed(scene::Records.Frame{Records.Entity{AutomotiveDrivin
     speed
 end
 
+function get_neighbor_id_from_scene(scene::Records.Frame{Records.Entity{AutomotiveDrivingModels.VehicleState,AutomotiveDrivingModels.VehicleDef,Int64}},
+                                    neighbor::AutomotiveDrivingModels.NeighborLongitudinalResult,
+                                    alternative_id::Int = 0)
+    # If there is a neighbor in the scene, we get its id in NGSIM.
+    if neighbor.ind != 0
+        neighbor_id = scene[neighbor.ind].id;
+    # If there is no neighbor, we assume the id is 0.
+    else
+        neighbor_id = alternative_id;
+    end
+    neighbor_id
+end
+
+# a_sample_neighbor_v_Δs_def is a subfunction of samples_neighbor_v_Δs_def
+function a_sample_neighbor_v_Δs_def!( speed_vec::Vector{Float32},
+                                      distance_vec::Vector{Float32},
+                                      scene::Records.Frame{Records.Entity{AutomotiveDrivingModels.VehicleState,AutomotiveDrivingModels.VehicleDef,Int64}},
+                                      neighbor::AutomotiveDrivingModels.NeighborLongitudinalResult,
+                                      original_neighborid::Int)
+
+    # Get the neighbor's id. The function get_neighbor_id_from_scene is defined in this file.
+    neighbor_id = get_neighbor_id_from_scene(scene, neighbor);
+    # If the neighbor is the original neighbor
+    if neighbor_id == original_neighborid
+        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
+        push!(distance_vec, neighbor.Δs);
+        push!(speed_vec, get_neighbor_speed(scene, neighbor));
+    # If the neighbor is not the original neighbor, we copy the distance and speed of the original neighbor.
+    else
+        push!(distance_vec, distance_vec[end]);
+        push!(speed_vec, speed_vec[end]);
+    end
+
+    # The vehicle definition.
+    if neighbor.ind != 0
+        vehicle_def = scene[neighbor.ind].def;
+    else
+        vehicle_def = VehicleDef(0, 0, 0);
+    end
+    # We output the following variables
+    (speed_vec, distance_vec, vehicle_def)
+end
+
+
+function samples_neighbor_v_Δs_def(get_neighbor_in_scene::Function,
+                                   trajdata::Records.ListRecord{AutomotiveDrivingModels.VehicleState,AutomotiveDrivingModels.VehicleDef,Int64},
+                                   roadway::AutomotiveDrivingModels.Roadway,
+                                   carid::Int,
+                                   cameraframe::Int;
+                                   sample_duration::Int = 1)
+    # Define an empty speed cache and distance cache here
+    speed_vec = Vector{Float32}()
+    distance_vec = Vector{Float32}()
+    # Record the type and dimension of the vehicle.
+    vehicle_def = AutomotiveDrivingModels.VehicleDef()
+
+    # We first want to record the information of the neighbor right at cameraframe.
+    scene = get!(Scene(500), trajdata, cameraframe);
+    neighbor = get_neighbor_in_scene(scene, carid, roadway);
+    # We want to get this neigbor's id.
+    original_neighbor_id = get_neighbor_id_from_scene(scene, neighbor);
+    # We get new samples of speed and distance.
+    (speed_vec, distance_vec, vehicle_def) = a_sample_neighbor_v_Δs_def!(speed_vec, distance_vec, scene, neighbor, original_neighbor_id);
+    # If the sample duration is longer than 1, we keep recording.
+    if sample_duration > 1
+        for i = 1:(sample_duration)
+            # Retrieve a neighbor from the scene.
+            scene = get!(Scene(500), trajdata, cameraframe - i);
+            neighbor = get_neighbor_in_scene(scene, carid, roadway);
+            # We get new samples of speed and distance.
+            (speed_vec, distance_vec, vehicle_def) = a_sample_neighbor_v_Δs_def!(speed_vec, distance_vec, scene, neighbor, original_neighbor_id);
+        end
+    end
+    (speed_vec, distance_vec, vehicle_def)
+end
+
+
 # ------------------------------------------------------------------------------
 # """
 # traffic_info_NGSIM gets the relative distance and absolute velocity of the ego or one of its neighbors.
@@ -114,24 +192,24 @@ function traffic_info_NGSIM(trajdata::Records.ListRecord{AutomotiveDrivingModels
                             aggregate_method::String = "mean")
     # Define a dictionary for traffic info
     traffic_info = Dict{Symbol, Union{Float32, VehicleDef}}()
-    # Define a speed cache and a distance chance here
-    speed_vec = Vector{Float32}(sample_duration)
-    speed = 0.0
-    distance_vec = Vector{Float32}(sample_duration)
-    distance = 0.0
-    # This record the type and dimension of the vehicle.
-    vehicle_def = AutomotiveDrivingModels.VehicleDef()
 
     # If the vehicle to be observed is the ego self,
     if longitudinal_direc == "self"
+        # Define a speed cache and a distance chance here
+        speed_vec = Vector{Float32}()
+        speed = 0.0
+        distance_vec = Vector{Float32}()
+        distance = 0.0
+        # This record the type and dimension of the vehicle.
+        vehicle_def = AutomotiveDrivingModels.VehicleDef()
         for i = 1:sample_duration
             scene = get!(Scene(500), trajdata, cameraframe +1 - i);
             # We get the index of the vehicle (carid) in the scene
             ego_ind = get_scene_id(scene, carid)
             # Let the distance to self be 0
-            distance_vec[i] = 0
+            push!(distance_vec, 0);
             # We get the velocity of the ego vehicle in unit [m/s].
-            speed_vec[i] = scene[ego_ind].state.v
+            push!(speed_vec, scene[ego_ind].state.v);
             # The vehicle definition.
             if i == 1
                 vehicle_def = scene[ego_ind].def
@@ -141,84 +219,19 @@ function traffic_info_NGSIM(trajdata::Records.ListRecord{AutomotiveDrivingModels
     elseif longitudinal_direc == "fore"
         # further if the vehicle to be observed shares the lane with the ego
         if lateral_direc == "middle"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:(sample_duration)
-                scene = get!(Scene(500), trajdata, cameraframe + 1 - i);
-                neighbor = get_neighbor_fore_along_lane_NGSIM(scene, carid, roadway)
-                # If there is one neighbor exist,
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_fore_along_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         # If the vehicle to be observed is in the left,
         elseif lateral_direc == "left"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:sample_duration
-                scene = get!(Scene(500), trajdata, cameraframe + 1  - i);
-                neighbor = get_neighbor_fore_along_left_lane_NGSIM(scene, carid, roadway)
-                # If there is one neighbor exist,
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_fore_along_left_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         # If the vehicle to be observed is on right,
         elseif lateral_direc == "right"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:sample_duration
-                scene = get!(Scene(500), trajdata, cameraframe + 1 - i);
-                neighbor = get_neighbor_fore_along_right_lane_NGSIM(scene, carid, roadway)
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_fore_along_right_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         else
             error("When getting front neighbor, the lateral direction is not valid.")
         end
@@ -226,82 +239,19 @@ function traffic_info_NGSIM(trajdata::Records.ListRecord{AutomotiveDrivingModels
     elseif longitudinal_direc == "rear"
         # further if the vehicle to be observed is in the middle
         if lateral_direc == "middle"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:sample_duration
-                scene = get!(Scene(500), trajdata, cameraframe + 1 - i);
-                neighbor = get_neighbor_rear_along_lane_NGSIM(scene, carid, roadway)
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_rear_along_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         # If the vehicle to be observed is on left
         elseif lateral_direc == "left"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:sample_duration
-                scene = get!(Scene(500), trajdata, cameraframe + 1 - i);
-                neighbor = get_neighbor_rear_along_left_lane_NGSIM(scene, carid, roadway)
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_rear_along_left_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         # If the vehicle to be observed is on the right,
         elseif lateral_direc == "right"
-            # We only want to record the information of the first neighbor when i=1
-            original_neighbor_id = 0;
-            for i = 1:sample_duration
-                scene = get!(Scene(500), trajdata, cameraframe + 1 - i);
-                neighbor = get_neighbor_rear_along_right_lane_NGSIM(scene, carid, roadway)
-                if neighbor.ind != 0
-                    # We retrieve the id of the first neighbor.
-                    if i == 1
-                        original_neighbor_id = scene[neighbor.ind].id;
-                        # The vehicle definition.
-                        vehicle_def = scene[neighbor.ind].def
-                    end
-                    # If the neighbor is the original neighbor
-                    if scene[neighbor.ind].id == original_neighbor_id  # when i = 1, this condition is guaranteed to be true!
-                        # We retrieve the distance between the neighbor and the ego and the speed of the neighbor.
-                        distance_vec[i] = neighbor.Δs
-                        speed_vec[i] = get_neighbor_speed(scene, neighbor)
-                    # If the neighbor is not the original neighbor, we copy the distance and speed at i-1
-                    else
-                        distance_vec[i] = distance_vec[i-1]
-                        speed_vec[i] = speed_vec[i-1]
-                    end
-                end
-            end
+            # Get samples of speed, distance, and vehicle type of the neighbor in this direction.
+            (speed_vec, distance_vec, vehicle_def) = samples_neighbor_v_Δs_def(get_neighbor_rear_along_right_lane_NGSIM, trajdata, roadway, carid, cameraframe, sample_duration = sample_duration);
+
         # If the vehicle to be observed is on right,
         else
             error("When getting rear neighbor, the lateral direction is not valid.")
@@ -411,7 +361,7 @@ end
 # """
 # Get the number of lane changes in lane 1--5 due to slow lead vehicle
 # """
-function lanechanges_dueto_slowlead()
+function lanedecisions_dueto_slowlead()
     # Start a timer
     tic();
     # Record the following numbers
@@ -424,14 +374,15 @@ function lanechanges_dueto_slowlead()
     n_abortedchanges = 0
     n_laneids_notempty = 0
     # Assign constant parameters.
-    SAMPLE_DURATION = 5
-    EVENT_SPEPARATION = 20
+    SAMPLE_DURATION = 1
+    EVENT_SPEPARATION = 50
+    LANEDECISION_DURATION = 50
     LOOK_AHEAD = 20
     #For a vehicle in all the vehicles:
     for egoid in keys(tdraw_my.car2start)  # tdraw_my is loaded by using MyNGSIM
         # Define info_after_trigger to contain the related information after an event-triggering
         # InfoAfterTrigger is defined in this file
-        info_after_trigger = InfoAfterTrigger(egoid = egoid);
+        info_after_trigger = InfoAfterTrigger(egoid = egoid, duration = LANEDECISION_DURATION);
         # Get the starting row of the ego vehicle in tdraw_my
         ego_start_row = tdraw_my.car2start[egoid];
         # Get the total number of frames of the ego vehicle in tdraw_my
@@ -534,7 +485,7 @@ function lanechanges_dueto_slowlead()
                     # If the separation is enough, we have a new event.
                     if ego_frame - ego_lastevent_frame > EVENT_SPEPARATION
                         n_triggers += 1;
-                        
+
                         # We first process the information in info_after_trigger for the previous recording
                         if !isempty(info_after_trigger.laneids)
                             n_laneids_notempty += 1;
@@ -547,12 +498,12 @@ function lanechanges_dueto_slowlead()
                             n_notchange += Δn_lanedecisions[4];
                             n_slow_lead += Δn_lanedecisions[5];
                         end
-
                         # We then reinitialize the info_after_trigger
                         info_after_trigger = InfoAfterTrigger(egoid = egoid,
                                                               triggerframe = ego_frame,
                                                               trigger_ind = n_triggers,
-                                                              triggered = true);
+                                                              triggered = true,
+                                                              duration = LANEDECISION_DURATION);
                     end
                     # We update the event triggering frame.
                     ego_lastevent_frame = ego_frame;
@@ -644,12 +595,23 @@ function lane_change_or_keep(info_after_trigger::InfoAfterTrigger)
         if !changinglane
             Δn_notchange += 1;
             # If the lead vehicle is slowing down,
-            if info_after_trigger.fore_v[1] - info_after_trigger.fore_v[end] > SPEED_DIFF_THRESHOLD
+            # We want to do some averaging.
+            avg_range = maximum([1, length(info_after_trigger.fore_v) ÷ 10]);
+            fore_v_head = mean(info_after_trigger.fore_v[1:avg_range]);
+            fore_v_end = mean(info_after_trigger.fore_v[(end+1-avg_range):end]);
+            if fore_v_head - fore_v_end > SPEED_DIFF_THRESHOLD
                 Δn_slow_lead += 1;
                 # If the relative speed of the lead to the ego is small enough, it is a lane-keeping.
                 rel_speed_fore = info_after_trigger.fore_v - info_after_trigger.ego_v;
                 if minimum( abs.(rel_speed_fore) ) <= (SPEED_DIFF_THRESHOLD / 2)
                     Δn_lanekeeps += 1;
+                # test code{
+                else
+                    #println(("rel_speed", rel_speed_fore))
+                    println(("fore_v", info_after_trigger.fore_v[1:10]))
+                    # println(("ego_v", info_after_trigger.ego_v))
+                    println(("egoid", info_after_trigger.egoid, "triggerframe,", info_after_trigger.triggerframe))
+                # test code}
                 end
             end
         end
@@ -847,4 +809,4 @@ function extract_epoch()
     toc();
 end
 
-lanechanges_dueto_slowlead()
+lanedecisions_dueto_slowlead()

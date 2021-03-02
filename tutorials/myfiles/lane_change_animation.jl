@@ -1,20 +1,20 @@
-# Prerequsite modules
-# using Reel
-# using AutoViz
 using Reel
+using AutoViz
+using MyNGSIM1
 
-AFTER_MARGIN = 50
-BEFORE_MARGIN = 50
+AFTER_MARGIN = 80
+BEFORE_MARGIN = 30
 
-include("extract_epoch.jl")
-making_films =  lanechanges_stats()# [vehicle_id, frame_index]
-# making_films = Dict{Int, Vector{Int}}()
-# making_films[2967] = [9277]
+# include("extract_epoch.jl")
+# making_films =  lanechanges_stats()# [vehicle_id, frame_index]
+making_films = Dict{Int, Vector{Int}}()
+making_films[2912] = [8475]
 
 for carid in keys(making_films)
     b_margin = BEFORE_MARGIN
     a_margin = AFTER_MARGIN
     for frame in making_films[carid]
+        # We make sure the frames do not exceed the frame range of the car.
         # Get the number of the preceding and remaining frames.
         car_start_row = tdraw_my.car2start[carid]
         car_start_frame = tdraw_my.df[car_start_row, :frame]
@@ -37,11 +37,26 @@ for carid in keys(making_films)
             carcolors = Dict{Int, Colorant}()
             carcolors[carid] = colorant"green";
             ego_ind = get_scene_id(scene, carid)
-            slide = render(scene, ROADWAY_my, [NeighborsOverlay(carid)],cam=CarFollowCamera{Int}(carid, 8.0, 2.0/9.0*pi), car_colors=carcolors);
+            # We want to highlight the trajectory after the event-trigginger frame by displaying a red font color.
+            if i >= 0
+                slide = render(scene, ROADWAY_my,
+                              [NeighborsOverlay(carid),
+                              TextOverlay(text=[@sprintf("ego id: %d", carid)], font_size= 20, pos=VecE2(250,30)),
+                              TextOverlay(text=[@sprintf("frame: %d", frame+i)], color = colorant"red", font_size= 20, pos=VecE2(250,60))],
+                              cam=CarFollowCamera{Int}(carid, 8.0, 2.0/9.0*pi),
+                              car_colors=carcolors);
+            else
+                slide = render(scene, ROADWAY_my,
+                              [NeighborsOverlay(carid),
+                              TextOverlay(text=[@sprintf("ego id: %d", carid)], font_size= 20, pos=VecE2(250,30)),
+                              TextOverlay(text=[@sprintf("frame: %d", frame+i)], font_size= 20, pos=VecE2(250,60))],
+                              cam=CarFollowCamera{Int}(carid, 8.0, 2.0/9.0*pi),
+                              car_colors=carcolors);
+            end
             push!(filmframes, slide)
         end
         filmframes;
-        write("./Animation/aborted_lane_change/i101_0820/lane_change_"*string(carid)*"_"*string(frame)*".mp4", filmframes);
+        write("./Animation/car_"*string(carid)*"_"*string(frame)*".mp4", filmframes);
         # write("test_"*string(carid)*"_"*string(frame)*".mp4", filmframes);
     end
 end
